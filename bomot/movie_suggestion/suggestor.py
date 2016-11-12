@@ -2,13 +2,14 @@
 # -*- coding: utf-8 -*-
 import sys  # import sys package, if not already imported
 
+import moviemap
+import themoviedb
+
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-import moviemap
 
-
-def list_movie(query_list):
+def _list_movie_suggestion(query_list):
     common_movies = set([])
 
     for query in query_list:
@@ -21,9 +22,23 @@ def list_movie(query_list):
 
         common_movies = common_movies.union(list_suggestions)
 
-    return len(common_movies)
+    return common_movies
 
 
-listm = list_movie(["x men", "the lion king", "cinderella"])
+def get_movies(query_list):
+    list_suggestions = _list_movie_suggestion(query_list)
+
+    list_titles = []
+    index = 0
+    for movie_sugg in list_suggestions:
+        if index >= 1:
+            break
+        list_titles.append(movie_sugg.title)
+        index += 1
+
+    return themoviedb.get_movies(list_titles)
+
+
+listm = get_movies(["x men", "the lion king", "cinderella"])
 
 print listm

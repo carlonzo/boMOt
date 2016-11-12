@@ -11,16 +11,10 @@ import requests
 from lxml import html
 
 
-class Movie:
+class MovieSuggestion:
     def __init__(self, title, relative_link):
         self.title = title
         self.link = self.resolve_relative_link(relative_link)
-
-    def title(self):
-        return self.title
-
-    def link(self):
-        return self.link
 
     def __str__(self):
         return "%s - %s" % (self.title, self.link)
@@ -60,7 +54,7 @@ def _get_movie_result_from_url(url):
         if "http://www.gnovies.com/discussion/" in link:
             link = ""
 
-        movie = Movie(movie_elem.text, link)
+        movie = MovieSuggestion(movie_elem.text, link)
         list_movie.append(movie)
 
     return list_movie
@@ -89,12 +83,3 @@ def enhance_movie_list(movie_list):
         count += 1
 
     return set(newlist)
-
-
-if __name__ == '__main__':
-    listm = get_movie_list("x man")
-
-    enhanced_list = enhance_movie_list(listm)
-
-    print len(listm)
-    print len(enhanced_list)
