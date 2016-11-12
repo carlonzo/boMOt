@@ -21,7 +21,7 @@ def _list_movie_suggestion(query_list):
 
         list_suggestions = moviemap.enhance_movie_list(list_suggestions)
 
-        common_movies = common_movies.union(list_suggestions)
+        common_movies = common_movies.intersection(list_suggestions)
 
     return common_movies
 
