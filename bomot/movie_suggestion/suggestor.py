@@ -7,25 +7,23 @@ sys.setdefaultencoding('utf-8')
 
 import moviemap
 
-common_movies = []
+
+def list_movie(query_list):
+    common_movies = set([])
+
+    for query in query_list:
+        list_suggestions = moviemap.get_movie_list(query)
+
+        if len(list_suggestions) == 0:
+            continue
+
+        list_suggestions = moviemap.enhance_movie_list(list_suggestions)
+
+        common_movies = common_movies.union(list_suggestions)
+
+    return len(common_movies)
 
 
-def add_movie_liked(query):
-    list_suggestions = moviemap.get_movie_list(query)
+listm = list_movie(["x men", "the lion king", "cinderella"])
 
-    if len(list_suggestions) == 0:
-        return 0
-
-    list_suggestions = moviemap.enhance_movie_list(list_suggestions)
-    common_movies.extend(list_suggestions)
-
-    return len(list_suggestions)
-
-
-
-
-add_movie_liked("xmen")
-add_movie_liked("the lion king")
-
-print common_movies
-print len(common_movies)
+print listm
