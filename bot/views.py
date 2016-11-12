@@ -1,10 +1,13 @@
 import json
+import urllib
 import uuid
 import apiai as apiai
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 import requests
 from bot.models import UserPrefs
+from movie_suggestion import suggestor
+from movie_suggestion.themoviedb import Movie
 
 ACCESS_TOKEN = "EAAS3evVdTA4BABt7fQZARCQA8Qz0jrO3YObjc5sgACTZC6XhdaJpkVsRB59b5lrpfIB1TZA1bkHGiARJagyZA4SAEajanRimbl1RC5WeAmnvQrmX4t6I6R5ghZCNc9duZALdagDuKenMCDdIBJUuHhTkujkztddiq0cG0Kh1ZAgNQZDZD"
 
@@ -72,10 +75,11 @@ def check_if_reset(message, user_prefs):
 
 
 def fetch_suggestion_and_show_to_user(user_id, user_prefs):
-    movie_url = "http://www.imdb.com/title/tt0371746/?ref_=fn_al_tt_1"
-    movie_image_url = "http://tinyurl.com/h2mx7rg"
-    movie_name = "Iron Man"
-    movie_description = "Iron Man"
+    movies = suggestor.get_movies(user_prefs.get_movies())
+    movie_name = movies[0].title()
+    movie_url = "https://www.justwatch.com/us/search?q=" + urllib.quote_plus(movie_name)
+    movie_image_url = movies[0].poster()
+    movie_description = movies[0].overview()
     send_generic_template(user_id, movie_url, movie_name, movie_image_url, movie_description)
 
 
