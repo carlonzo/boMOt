@@ -39,6 +39,6 @@ def get_movies(query_list):
     return themoviedb.get_movies(list_titles)
 
 
-listm = get_movies(["x men", "the lion king", "cinderella"])
+# listm = get_movies(["x men", "the lion king", "cinderella"])
 
-print listm
+# print listm
