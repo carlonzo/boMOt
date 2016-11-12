@@ -2,6 +2,7 @@ import requests
 
 API_TOKEN = '3a56894826a35368f1dbabf033f5c428'
 QUERY_URL = 'https://api.themoviedb.org/3/search/movie?api_key=%s&language=en-US&query=%s'
+MOVIE_URL = 'https://api.themoviedb.org/3/movie/%s?api_key=%s&language=en-US'
 
 
 class Movie:
@@ -10,6 +11,7 @@ class Movie:
         self.poster = ""
         self.vote = 0
         self.overview = ""
+        self.link = ""
 
     def __str__(self):
         return "%s" % self.title
@@ -18,7 +20,7 @@ class Movie:
         return self.__str__()
 
 
-def _get_movie_result(query):
+def _search_movie(query):
     url = QUERY_URL % (API_TOKEN, query)
     print "query url %s " % url
 
@@ -33,21 +35,36 @@ def _get_movie_result(query):
     return results[0]
 
 
-def get_movies(movies_to_query):
-    movies_found = []
+def _retrieve_movie(id_movie):
+    url = MOVIE_URL % (id_movie, API_TOKEN)
+    print "movie url %s " % url
 
-    for movie in movies_to_query:
+    r = requests.get(url)
 
-        movie_result = _get_movie_result(movie.title())
+    if r.status_code != 200:
+        return None
 
-        if movie_result is None:
-            continue
+    return r.json()
 
-        movie_found = Movie(movie_result['title'])
-        movie_found.poster = "http://image.tmdb.org/t/p/w300/" + movie_result['poster_path']
-        movie_found.vote = movie_result['vote_average']
-        movie_found.overview = movie_result['overview']
 
-        movies_found.append(movie_found)
+def get_movie(title_query):
+    search_result = _search_movie(title_query)
 
-    return movies_found
+    if search_result is None:
+        return None
+
+    movie_result = _retrieve_movie(search_result['id'])
+
+    if movie_result is None:
+        return None
+
+    movie_found = Movie(movie_result['title'])
+    movie_found.poster = "http://image.tmdb.org/t/p/w300/" + movie_result['poster_path']
+    movie_found.vote = movie_result['vote_average']
+    movie_found.overview = movie_result['overview']
+    movie_found.link = "http://www.imdb.com/title/%s/" % movie_result['imdb_id']
+
+    return movie_found
+
+
+print get_movie("x men")

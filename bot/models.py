@@ -1,4 +1,5 @@
 import uuid
+
 from django.db import models
 
 
@@ -12,3 +13,14 @@ class UserPrefs(models.Model):
 
     def __str__(self):
         return self.user_id
+
+
+class MovieSuggest(models.Model):
+    movies = models.CharField(max_length=50000, blank=False, null=False)
+    user_id = models.CharField(max_length=500, blank=False, null=False)
+
+    def __str__(self):
+        return self.user_id
+
+    def get_movies(self):
+        return self.movies.split(",")

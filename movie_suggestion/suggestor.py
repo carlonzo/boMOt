@@ -4,6 +4,7 @@ import sys  # import sys package, if not already imported
 
 import moviemap
 import themoviedb
+from bot.models import MovieSuggest
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -25,20 +26,48 @@ def _list_movie_suggestion(query_list):
     return common_movies
 
 
-def get_movies(query_list):
+def generate_suggestions(user_id, query_list):
     list_suggestions = _list_movie_suggestion(query_list)
 
     list_titles = []
     index = 0
     for movie_sugg in list_suggestions:
-        if index >= 1:
+        if index >= 20:
             break
         list_titles.append(movie_sugg.title)
         index += 1
 
-    return themoviedb.get_movies(list_titles)
+    list_titles_string = ','.join([str(x) for x in list_titles])
+
+    modelMovieDB = MovieSuggest(user_id=user_id, movies=list_titles_string)
+    modelMovieDB.save()
 
 
-listm = get_movies(["x men", "the lion king", "cinderella"])
+def get_next_suggestion(user_id):
+    modelMovieDB = MovieSuggest.objects.get(user_id=user_id)
 
-print listm
+    movie_titles = modelMovieDB.get_movies()
+
+    movie = None
+    for i in range(len(movie_titles)):
+        title = movie_titles[i]
+        movie = themoviedb.get_movie(title)
+
+        if movie is None:
+            continue
+
+        movie_titles = movie_titles[i:]
+
+    list_titles_string = ','.join([str(x) for x in movie_titles])
+    modelMovieDB = MovieSuggest(user_id=user_id, movies=list_titles_string)
+    modelMovieDB.save()
+
+    return movie
+
+
+if __name__ == '__main__':
+    generate_suggestions("abc", ["x men", "the lion king", "cinderella"])
+
+    print get_next_suggestion("abc")
+    print get_next_suggestion("abc")
+    print get_next_suggestion("abc")
