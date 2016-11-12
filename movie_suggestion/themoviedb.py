@@ -44,7 +44,7 @@ def get_movies(movies_to_query):
             continue
 
         movie_found = Movie(movie_result['title'])
-        movie_found.poster = "http://image.tmdb.org/t/p" + movie_result['poster_path']
+        movie_found.poster = "http://image.tmdb.org/t/p/w300/" + movie_result['poster_path']
         movie_found.vote = movie_result['vote_average']
         movie_found.overview = movie_result['overview']
 
