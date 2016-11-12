@@ -1,13 +1,14 @@
 import json
+import threading
 import urllib
 import uuid
 import apiai as apiai
+from django.utils.termcolors import background
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 import requests
 from bot.models import UserPrefs
 from movie_suggestion import suggestor
-from movie_suggestion.themoviedb import Movie
 
 ACCESS_TOKEN = "EAAS3evVdTA4BABt7fQZARCQA8Qz0jrO3YObjc5sgACTZC6XhdaJpkVsRB59b5lrpfIB1TZA1bkHGiARJagyZA4SAEajanRimbl1RC5WeAmnvQrmX4t6I6R5ghZCNc9duZALdagDuKenMCDdIBJUuHhTkujkztddiq0cG0Kh1ZAgNQZDZD"
 
@@ -37,7 +38,7 @@ def send_generic_template(user_id, movie_url, movie_name, movie_image_url, movie
                             "title": "Watch"
                         }, {
                             "type": "postback",
-                            "title": "Something else please",
+                            "title": "Something else",
                             "payload": "NEXT_SUGGESTION"
                         }]
                     }]
@@ -75,11 +76,21 @@ def check_if_reset(message, user_prefs):
 
 
 def fetch_suggestion_and_show_to_user(user_id, user_prefs):
+    download_thread = threading.Thread(target=fetch_movies, args=[user_id, user_prefs])
+    download_thread.start()
+
+
+def fetch_movies(user_id, user_prefs):
+    send_message("This might take up to 20 seconds.", user_id)
+    t = threading.Timer(6.0, send_message, args=["Almost there", user_id])
+    t = threading.Timer(12.0, send_message, args=["A bit more :)", user_id])
+    t.start()
+
     movies = suggestor.get_movies(user_prefs.get_movies())
-    movie_name = movies[0].title()
+    movie_name = movies[0].title
     movie_url = "https://www.justwatch.com/us/search?q=" + urllib.quote_plus(movie_name)
-    movie_image_url = movies[0].poster()
-    movie_description = movies[0].overview()
+    movie_image_url = movies[0].poster
+    movie_description = movies[0].overview
     send_generic_template(user_id, movie_url, movie_name, movie_image_url, movie_description)
 
 
@@ -131,13 +142,14 @@ def webhook(request):
 
             user_prefs.save()
 
+            send_message(speech_response, user_id)
+
             if result["action"] == "fetch-movie-suggestion":
                 fetch_suggestion_and_show_to_user(user_id, user_prefs)
-            else:
-                send_message(speech_response, user_id)
+
         else:
-            if "payload" in messaging:
-                is_next_suggestion = messaging['payload'] == "NEXT_SUGGESTION"
+            if "postback" in messaging:
+                is_next_suggestion = messaging['postback']['payload'] == "NEXT_SUGGESTION"
                 if is_next_suggestion:
                     fetch_suggestion_and_show_to_user(user_id, user_prefs)
 
