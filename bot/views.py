@@ -2,11 +2,12 @@ import json
 import threading
 import urllib
 import uuid
+
 import apiai as apiai
-from django.utils.termcolors import background
+import requests
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-import requests
+
 from bot.models import UserPrefs
 from movie_suggestion import suggestor
 
@@ -15,6 +16,15 @@ ACCESS_TOKEN = "EAAS3evVdTA4BABt7fQZARCQA8Qz0jrO3YObjc5sgACTZC6XhdaJpkVsRB59b5lr
 API_AI_ACCESS_TOKEN = "81265a838d6a40b0a086e9b84cb6d67e"
 
 session_id = None
+
+
+def marios(request):
+    suggestor.generate_suggestions("abc", ['die hard', 'x man'])
+
+    print suggestor.get_next_suggestion("abc")
+    print suggestor.get_next_suggestion("abc")
+
+    return HttpResponse(status=200)
 
 
 def send_generic_template(user_id, movie_url, movie_name, movie_image_url, movie_description):

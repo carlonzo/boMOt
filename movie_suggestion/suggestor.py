@@ -1,13 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import sys  # import sys package, if not already imported
+import os
+
+import sys
+
+reload(sys)
+sys.path.insert(0, os.path.abspath("../"))  # base folder is one folder up
+sys.setdefaultencoding('utf-8')
 
 import moviemap
 import themoviedb
 from bot.models import MovieSuggest
-
-reload(sys)
-sys.setdefaultencoding('utf-8')
 
 
 def _list_movie_suggestion(query_list):
@@ -21,7 +24,12 @@ def _list_movie_suggestion(query_list):
 
         list_suggestions = moviemap.enhance_movie_list(list_suggestions)
 
-        common_movies = common_movies.intersection(list_suggestions)
+        print ("movielist for %s : %s" % (query, len(list_suggestions)))
+        if len(common_movies) == 0:
+            common_movies = set(list_suggestions)
+        else:
+            common_movies = common_movies.intersection(list_suggestions)
+        print ("intersection for %s : %s" % (query, len(common_movies)))
 
     return common_movies
 
@@ -49,14 +57,15 @@ def get_next_suggestion(user_id):
     movie_titles = modelMovieDB.get_movies()
 
     movie = None
-    for i in range(len(movie_titles)):
-        title = movie_titles[i]
+    while movie == None:
+
+        if len(movie_titles) == 0:
+            break
+        
+        title = movie_titles[0]
         movie = themoviedb.get_movie(title)
 
-        if movie is None:
-            continue
-
-        movie_titles = movie_titles[i:]
+        del movie_titles[0]
 
     list_titles_string = ','.join([str(x) for x in movie_titles])
     modelMovieDB = MovieSuggest(user_id=user_id, movies=list_titles_string)
