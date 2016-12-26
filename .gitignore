@@ -97,3 +97,4 @@ bomot/urls.pyc
 bomot/wsgi.pyc
 db.sqlite3
 .idea/
+bot/migrations/
