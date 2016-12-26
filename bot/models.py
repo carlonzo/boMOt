@@ -17,7 +17,7 @@ class UserPrefs(models.Model):
 
 class MovieSuggest(models.Model):
     movies = models.CharField(max_length=50000, blank=False, null=False)
-    user_id = models.CharField(max_length=500, blank=False, null=False)
+    user_id = models.CharField(primary_key=True, max_length=500, blank=False, null=False)
 
     def __str__(self):
         return self.user_id

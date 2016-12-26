@@ -1,3 +1,6 @@
+from __future__ import print_function
+from __future__ import print_function
+from __future__ import print_function
 import requests
 
 API_TOKEN = '3a56894826a35368f1dbabf033f5c428'
@@ -22,14 +25,14 @@ class Movie:
 
 def _search_movie(query):
     url = QUERY_URL % (API_TOKEN, query)
-    print "query url %s " % url
+    print("query url %s " % url)
 
     r = requests.get(url)
 
     results = r.json()['results']
 
     if len(results) == 0:
-        print "movie %s not found on themoviedb" % query
+        print("movie %s not found on themoviedb" % query)
         return None
 
     return results[0]
@@ -37,7 +40,7 @@ def _search_movie(query):
 
 def _retrieve_movie(id_movie):
     url = MOVIE_URL % (id_movie, API_TOKEN)
-    print "movie url %s " % url
+    print("movie url %s " % url)
 
     r = requests.get(url)
 
@@ -65,6 +68,3 @@ def get_movie(title_query):
     movie_found.link = "http://www.imdb.com/title/%s/" % movie_result['imdb_id']
 
     return movie_found
-
-
-print get_movie("x men")
